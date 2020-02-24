@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# here is out process:
+# 0. set build tree layout
+# 1. install binutils
+# 2. install gcc without libc support
+# 3. install libc
+# 4. install gcc with libc support
+
+# Notes/hacks:
+# 0. No need to patch external projects :)
+# 1. Add a crt1.o -> crt0.o symlink to mimic glibc's interface for CSU against gcc
+# 2. add a target/$TARGET -> . link for gcc to discover libc headers
+
 set -e
 
 # Assumptions:
@@ -14,16 +26,6 @@ GCC_SOURCE_TREE=${HOME}/dev/gcc
 # linked against both host and target
 TARGET_PREFIX=${PWD}/target
 
-# here is out process:
-# 1. install binutils
-# 2. install gcc without libc support
-# 3. install libc
-# 4. install gcc with libc support
-
-# Notes/hacks:
-# 0. No need to patch external projects :)
-# 1. Add a crt1.o -> crt0.o symlink to mimic glibc's interface for CSU against gcc
-# 2. add a target/$TARGET -> . link for gcc to discover libc headers
 
      TARGET=x86_64-unknown-linux-relibc
 RUST_TARGET=x86_64-unknown-linux-gnu
@@ -33,6 +35,15 @@ export CCACHE_DIR=${PWD}/ccache
 mkdir -p "${CCACHE_DIR}"
 export PATH="$(portageq envvar EPREFIX)/usr/lib/ccache/bin:${PATH}"
 echo "PATH=$PATH"
+
+# 0. set build tree layout
+
+mkdir -p "${TARGET_PREFIX}"
+
+# as we build gcc as a cross-compiler it searches headers and libs in $prefix/$target
+# but we are lazy and install relibc to $prefix
+[[ -L "${TARGET_PREFIX}/${TARGET}" ]] ||
+ln -svf . "${TARGET_PREFIX}/${TARGET}"
 
 # 1. binutils
 [[ -f binutils-build.done ]] ||
@@ -102,9 +113,7 @@ echo "PATH=$PATH"
     touch relibc.done
 )
 
-[[ -L "${TARGET_PREFIX}/${TARGET}" ]] ||
-ln -svf . "${TARGET_PREFIX}/${TARGET}"
-
+# gcc assumes crt1.o to provide _start symbol, but relibc has it only in crt0.o.
 ln -svf crt0.o "${TARGET_PREFIX}/lib/crt1.o"
 
 # 4. install gcc with libc support
