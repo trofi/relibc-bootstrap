@@ -15,8 +15,8 @@
 set -e
 
 # Assumptions:
-# sources of gcc are in ~/dev/gcc
-# sources on binutils are in ~/dev/binutils-gdb
+# sources of gcc are in ~/dev/git/gcc
+# sources on binutils are in ~/dev/git/binutils-gdb
 # result toolchain and root is in ./target
 # 'rustup' has 'nightly' toolchain available
 
