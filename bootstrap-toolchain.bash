@@ -20,12 +20,11 @@ set -e
 # result toolchain and root is in ./target
 # 'rustup' has 'nightly' toolchain available
 
-BINUTILS_SOURCE_TREE=${HOME}/dev/binutils-gdb
-GCC_SOURCE_TREE=${HOME}/dev/gcc
+BINUTILS_SOURCE_TREE=${HOME}/dev/git/binutils-gdb
+GCC_SOURCE_TREE=${HOME}/dev/git/gcc
 # where cross-compilers and target libraries/binaries live
 # linked against both host and target
 TARGET_PREFIX=${PWD}/target
-
 
      TARGET=x86_64-unknown-linux-relibc
 RUST_TARGET=x86_64-unknown-linux-gnu
