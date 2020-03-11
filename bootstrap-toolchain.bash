@@ -52,6 +52,7 @@ ln -svf . "${TARGET_PREFIX}/${TARGET}"
     "${BINUTILS_SOURCE_TREE}"/configure \
         --target=$TARGET \
         --prefix="${TARGET_PREFIX}" \
+        \
         --disable-gdb
     make -j $(nproc)
     make -j $(nproc) install
@@ -145,4 +146,20 @@ ln -svf crt0.o "${TARGET_PREFIX}/lib/crt1.o"
     make -j $(nproc) install
     popd
     touch gcc-with-libc.done
+)
+
+# 5. gdb
+[[ -f gdb-build.done ]] ||
+(
+    mkdir -p gdb-build
+    pushd    gdb-build
+    "${BINUTILS_SOURCE_TREE}"/configure \
+        --target=$TARGET \
+        --prefix="${TARGET_PREFIX}" \
+        \
+        --enable-gdb
+    make -j $(nproc)
+    make -j $(nproc) install
+    popd
+    touch gdb-build.done
 )
